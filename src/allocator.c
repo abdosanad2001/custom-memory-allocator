@@ -77,3 +77,26 @@ void *custom_malloc(size_t size) {
     // Return pointer to payload right after the metadata header
     return (block + 1);
 }
+
+// Release allocated memory and merge contiguous free blocks (coalescing)
+void custom_free(void *ptr) {
+    if (!ptr) {
+        return;
+    }
+
+    pthread_mutex_lock(&global_malloc_lock);
+
+    // Retrieve block metadata header
+    block_meta *block = ((block_meta *)ptr) - 1;
+    block->is_free = 1;
+
+    // Forward Coalescing: merge with next block if it is free and physically contiguous
+    if (block->next && block->next->is_free) {
+        if ((char *)block + META_SIZE + block->size == (char *)block->next) {
+            block->size += META_SIZE + block->next->size;
+            block->next = block->next->next;
+        }
+    }
+
+    pthread_mutex_unlock(&global_malloc_lock);
+}
