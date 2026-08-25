@@ -1,3 +1,5 @@
+![C CI](https://github.com/abdosanad2001/custom-memory-allocator/actions/workflows/ci.yml/badge.svg)
+
 # Custom Memory Allocator
 
 A thread-safe, explicit free-list memory allocator implemented in pure C. 
